@@ -1,0 +1,433 @@
+import { Box } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getAllSubCategoryThunk,
+  getSubCategoryThunk,
+} from "../../store/actions/categoryAction";
+import { Button } from "@mui/material";
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
+import "../aboutUs/aboutUs.scss";
+import axios from "axios";
+import Swal from "sweetalert2";
+import { baseUrl, token } from "../../config/config";
+import { TextField } from "@mui/material";
+
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import SubAdd from "./subAdd";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 600,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+  height: 600,
+  overflowY: "scroll",
+};
+
+const SubCategory = () => {
+  const dispatch = useDispatch();
+  const data = useSelector((state) => state?.categoryReducer.allSub);
+  const subData = useSelector((state) => state?.categoryReducer.sub);
+  const [categorys, setCategorys] = useState();
+  const [open, setOpen] = React.useState(false);
+  const [openDelete, setOpenDelete] = React.useState(false);
+  const [sub, setSub] = useState(false);
+  const [subId, setSubId] = useState(null);
+  const [subs, setSubs] = useState(null);
+
+  const [openAdd, setOpenAdd] = useState(false);
+  const [currentId, setCurrentId] = useState(null);
+  const handleClose = () => {
+    setOpen(false);
+    setSub(false);
+  };
+  const handleCloseDelete = () => setOpenDelete(false);
+  const handleCloseAdd = () => setOpenAdd(false);
+  const [editImage, setEditImage] = useState("");
+  useEffect(() => {
+    dispatch(getAllSubCategoryThunk());
+  }, []);
+
+  const [am, setAm] = useState();
+  const [ru, setRu] = useState();
+  const [en, setEn] = useState();
+  const [dam, setDam] = useState();
+  const [dru, setDru] = useState();
+  const [den, setDen] = useState();
+  const [pric, setPric] = useState();
+  useEffect(() => {
+    setCategorys(data);
+    setSubs(subData);
+  }, [data, subData]);
+
+  useEffect(() => {
+    dispatch(getSubCategoryThunk(subId));
+    setEditImage(subData?.mainImage);
+  }, [subId]);
+
+  const handelDelete = () => {
+    axios
+      .post(
+        `${baseUrl}/subCategory/del`,
+        {
+          id: currentId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then(function (response) {
+        if (!response.data.error) {
+          setOpenDelete(false);
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Succses",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setCategorys(response.data);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const handleSubEdit = () => {
+    axios
+      .post(
+        `${baseUrl}/subCategory/edit`,
+        {
+          id: subId,
+          nameHy: am,
+          nameRu: ru,
+          nameEn: en,
+          descHy: dam,
+          descRu: dru,
+          descEn: den,
+          mainImage: editImage,
+          price: pric,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then(function (response) {
+        if (!response.data.error) {
+          setOpen(false);
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Succses",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          setCategorys(response.data);
+          setSubId(null);
+          setSub(false);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const handleFile = (e) => {
+    let files = [];
+    Object.keys(e.target.files).map((f) => {
+      if (f === "Length") return;
+      files.push(e.target.files[0]);
+    });
+    uploadImage(files);
+  };
+  let arrOfImages = [];
+
+  const uploadImage = (files) => {
+    const formData = new FormData();
+    formData.append("file", files[0]);
+    formData.append("upload_preset", "armcodingImage");
+    formData.append("cloud_name", "armcoding");
+    axios
+      .post(`https://api.cloudinary.com/v1_1/armcoding/image/upload`, formData)
+      .then((res) => {
+        setEditImage(res.data.url);
+      });
+  };
+  return (
+    <Box m={3} className="boxHeigth">
+      <h2 mt={3} mb={3}>
+      Ենթակատեգորիաների կարգավորումներ
+      </h2>
+      <Box m={2}>
+        <Button
+          color="secondary"
+          variant="contained"
+          onClick={() => setOpenAdd(true)}
+        >
+          Ավելացնել
+        </Button>
+      </Box>
+      <Box>
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                {/* <TableCell align="left">Category</TableCell> */}
+                <TableCell align="left">Անուն Հայ</TableCell>
+                <TableCell align="left">Անուն Ռու</TableCell>
+                <TableCell align="left">Անուն En</TableCell>
+                <TableCell align="left">Նկարագրություն Հայ</TableCell>
+                <TableCell align="left">Նկարագրություն Ռու</TableCell>
+                <TableCell align="left">Նկարագրություն En</TableCell>
+                <TableCell align="left">պատկեր</TableCell>
+                <TableCell align="left">Խմբագրել</TableCell>
+                <TableCell align="left">Ջնջել</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {categorys &&
+                categorys.map((y) => (
+                  <TableRow
+                    key={y.id}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    {/* <TableCell component="th" scope="row">
+                      {y?.Category?.naemHy}
+                    </TableCell> */}
+                    <TableCell component="th" scope="row">
+                      {y.naemHy}
+                    </TableCell>
+                    <TableCell align="left">{y.nameRu}</TableCell>
+                    <TableCell align="left">{y.nameEn}</TableCell>
+                    <TableCell align="left">{y.descHy}</TableCell>
+                    <TableCell align="left">{y.descRu}</TableCell>
+                    <TableCell align="left">{y.descEn}</TableCell>
+                    <TableCell align="left">
+                      <img
+                        src={y?.mainImage}
+                        alt="mainImage"
+                        style={{
+                          width: "400px",
+                          height: "400px",
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell align="left">
+                      <Button
+                        color="secondary"
+                        variant="contained"
+                        onClick={() => {
+                          setSubId(y?.id);
+                          setSub(true);
+                          setAm(y.naemHy);
+                          setEn(y.nameEn);
+                          setRu(y.nameRu);
+                          setPric(y.price);
+                          setDen(y.nameEn);
+                          setDam(y.descHy);
+                          setDru(y.descRu);
+                          setDen(y.descEn);
+                        }}
+                      >
+                        Խմբագրել
+                      </Button>
+                    </TableCell>
+                    <TableCell align="left">
+                      <Button
+                        color="secondary"
+                        variant="contained"
+                        onClick={() => {
+                          setOpenDelete(true);
+                          setCurrentId(y.id);
+                        }}
+                      >
+                        Ջնջել
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Modal
+          open={openDelete}
+          onClose={handleCloseDelete}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+            Ջնջել ?
+            </Typography>
+            <Typography
+              className="btnsBox"
+              id="modal-modal-description"
+              sx={{ mt: 2 }}
+            >
+              <div>
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  onClick={handleCloseDelete}
+                >
+                  Ոչ
+                </Button>
+              </div>
+              <div>
+                <Button
+                  color="secondary"
+                  variant="contained"
+                  onClick={handelDelete}
+                >
+                  Այո՛
+                </Button>
+              </div>
+            </Typography>
+          </Box>
+        </Modal>
+        <SubAdd
+          openAdd={openAdd}
+          handleCloseAdd={handleCloseAdd}
+          style={style}
+          setOpenAdd={setOpenAdd}
+          setCategorys={setCategorys}
+        />
+      </Box>
+
+      <Modal
+        open={sub}
+        onClose={() => {
+          setSubId(null);
+          setSub(false);
+        }}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            <h3>Edit Subcategory</h3>
+            <TextField
+              id="filled-basic"
+              label="Հայ"
+              variant="filled"
+              className="addInp"
+              name="naemHy"
+              value={am}
+              onChange={(e) => setAm(e.target.value)}
+            />
+            <TextField
+              id="filled-basic"
+              label="Ռու"
+              variant="filled"
+              className="addInp"
+              name="nameRu"
+              value={ru}
+              onChange={(e) => setRu(e.target.value)}
+            />
+            <TextField
+              id="filled-basic"
+              label="En"
+              variant="filled"
+              className="addInp"
+              name="nameEn"
+              value={en}
+              onChange={(e) => setEn(e.target.value)}
+            />
+            <TextField
+              id="filled-basic"
+              label="Գին"
+              variant="filled"
+              className="addInp"
+              name="price"
+              value={pric}
+              onChange={(e) => setPric(e.target.value)}
+            />
+            <textarea
+              id="w3review"
+              rows="8"
+              value={dam}
+              onChange={(e) => setDam(e.target.value)}
+              name="descHy"
+              maxLength="600"
+              cols="60"
+              className="textareaText"
+            />
+            <textarea
+              id="w3review"
+              rows="8"
+              value={dru}
+              onChange={(e) => setDru(e.target.value)}
+              name="descRu"
+              maxLength="600"
+              cols="60"
+              className="textareaText"
+            />
+            <textarea
+              id="w3review"
+              rows="8"
+              value={den}
+              onChange={(e) => setDen(e.target.value)}
+              maxLength="600"
+              cols="60"
+              className="textareaText"
+            />
+            <div>
+              {editImage && (
+                <div>
+                  <img
+                    src={editImage}
+                    alt="image"
+                    style={{
+                      width: "150px",
+                      height: "150px",
+                    }}
+                  />
+                  <Button
+                    color="secondary"
+                    variant="contained"
+                    component="label"
+                    style={{
+                      margin: "20px",
+                    }}
+                  >
+                    {editImage ? "Փոխել պատկերը" : "Վերբեռնել պատկերը"}
+                    <input type="file" hidden multiple onChange={handleFile} />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            <Button
+              color="secondary"
+              variant="contained"
+              onClick={handleSubEdit}
+            >
+              Ներկայացնել
+            </Button>
+          </Typography>
+        </Box>
+      </Modal>
+    </Box>
+  );
+};
+
+export default SubCategory;
