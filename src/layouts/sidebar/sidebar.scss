@@ -12,13 +12,8 @@
     background: white;
 
     .logo {
-      font-size: 30px;
       font-weight: bold;
-      color: #1A1940;
-
-      img {
-        height: 100px;
-      }
+      color: #1a1940;
     }
   }
 
@@ -50,14 +45,14 @@
         cursor: pointer;
 
         &:hover {
-          background-color: #1A1940;
+          background-color: #1a1940;
           color: white;
           transition: 300ms;
         }
 
         .icon {
           font-size: 18px;
-          color: #1A1940;
+          color: #1a1940;
         }
 
         span {
@@ -78,7 +73,7 @@
       width: 20px;
       height: 20px;
       border-radius: 5px;
-      border: 1px solid #1A1940;
+      border: 1px solid #1a1940;
       cursor: pointer;
       margin: 5px;
 
@@ -91,19 +86,19 @@
       }
 
       &:nth-child(3) {
-        background-color: #1A1940;
+        background-color: #1a1940;
       }
     }
   }
 }
 
 .activeLink {
-  color: #1A1940;
+  color: #1a1940;
   font-weight: bold;
 }
 
 .hra {
-  color: #1A1940 !important;
+  color: #1a1940 !important;
 }
 
 .pasiveLink {
@@ -112,9 +107,9 @@
 }
 //--------------------------footer--------------------------
 
-.footerBox{
+.footerBox {
   width: 99%;
-  background:#1A1940;
+  background: #1a1940;
   padding: 5px;
   display: flex;
   justify-content: center;

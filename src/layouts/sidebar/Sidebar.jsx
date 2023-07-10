@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { isAuthPages } from "../../utils/routing/routes";
 import { useLocation } from "react-router-dom";
-
+import logo from "./logo.png";
 const Sidebar = () => {
   const isAuth = useSelector((state) => state.isAuthReducer.isAuth);
   let location = useLocation();
@@ -14,11 +14,8 @@ const Sidebar = () => {
       <div className="top">
         <span
           className="logo"
-          style={{
-            fontSize: "30px",
-          }}
         >
-          Logo
+          <img src={logo} alt="logo" />
         </span>
       </div>
       <hr />

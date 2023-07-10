@@ -46,7 +46,7 @@ const Navbar = ({ close, setClose }) => {
     dis(getCategoryThunk());
   }, []);
   useEffect(() => {
-    socket.current = io("ws://localhost:8001");
+    socket.current = io("ws://localhost:8000");
     socket.current.on("getActivityInvite", (data) => {
       console.log(data, "-------");
       setNotifications([...notifications, data]);

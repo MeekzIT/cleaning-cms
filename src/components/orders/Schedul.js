@@ -75,7 +75,8 @@ const SchedulerComponent = () => {
           />
           <MonthView dayScaleCellComponent />
           <Toolbar />
-          <TodayButton messages={{ today: "Ներկայիս օրը" }} />
+          <DateNavigator />
+          <TodayButton messages={{ today: "այսօր" }} />
           <Appointments />
           <AppointmentTooltip showOpenButton showDeleteButton showCloseButton />
           <AppointmentForm
